@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import os
 import warnings
 from paracevir import ParaCevir
@@ -417,7 +418,7 @@ class Fatura():
 
         firma = df_firma.values[0][1]
         faturaTür = 'Doğalgaz Aboneliği Ödemesi'
-
+        
         warnings.simplefilter(action='ignore', category=UserWarning)
         
         if os.path.exists(yolFatura):
@@ -442,9 +443,8 @@ class Fatura():
                 df_mys[['VKN', 'Okul']] = df_mys['Harcama Birimi'].str.split('-', expand=True) #Harcama Birimi kısmını VKN ve Okul olarak ayırıyor
                 df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
                 df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
-                df_mys['Abone']=df_mys['VKN'] #Müşteri kimlik bilgisi kısmını bölüyor
-                
-                df_mys['Abone']=df_mys['Abone'].astype(float) #abone numaralarını mebbis dosyasıyla eşlemek için tam sayı haline getiriyor
+                df_mys['Abone']="" #Boş bir abone sütunu açıyor
+
                 #gereksiz sütunları temizliyor
                 df_mys = df_mys.drop(columns=['Harcama Birimi',
                                             'Fatura Tarihi',
@@ -466,7 +466,23 @@ class Fatura():
                 ]
                 df_mebbis = df_mebbis.reindex(cols_to_keep_meb, axis=1)
                 df_mebbis = df_mebbis.drop(df_mebbis.index[-1]) #tablodaki son satırı siliyor
-                df_mebbis['ABONE NUMARASI']=df_mebbis['VERGİ NO'].astype(int) #abone numaralarını mys dosyasıyla eşlemek için tam sayı haline getiriyor
+    
+                df_mebbis['ABONE NUMARASI']=df_mebbis['ABONE NUMARASI'].astype(float) 
+
+                meb_abo_col = df_mebbis.columns.get_loc('ABONE NUMARASI')
+                mys_abo_col = df_mys.columns.get_loc('Abone')
+                meb_fat_col = df_mebbis.columns.get_loc('FATURA NUMARASI')
+                
+                for i in range(len(df_mebbis.index)):
+                    indices_fatura = np.where(df_mys['Fatura No'] == df_mebbis.iat[i,meb_fat_col])
+                    row_indices_fatura = indices_fatura[0]
+                    if row_indices_fatura.size != 0:
+                        fatNo = df_mys['Fatura No'].values == df_mebbis.iat[i,meb_fat_col]
+                        if max(fatNo)==True: 
+                            row_indices_df_mys = np.where(fatNo == True)
+                            df_mys.iat[row_indices_df_mys[0][0],mys_abo_col] = df_mebbis.iat[i,meb_abo_col]
+
+                
                 df_mebbis['VERGİ NO']=df_mebbis['VERGİ NO'].astype(str) #ilerde hata almamak için kolonun veri tipini değiştiriyor
                 df_mebbis['İCMAL NO']=df_mebbis['İCMAL NO'].astype(str) #böylece normalde sayısal veriler kayıpsız şekilde metin olarak saklanabiliyor
                 
@@ -527,7 +543,6 @@ class Fatura():
                     'ilkTertip': ilkTertip,
                     'anaTertip': anaTertip
                 }       
-
 
                 MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()
 
