@@ -140,8 +140,8 @@ class Fatura():
                 }
                 
                 tür = 'elektrik'
-                ilkTertip = f'40.149.423.18734.13.68.01.03.02'
-                anaTertip = f'40.149.422.18735.13.68.01.03.02'
+                ilkTertip = f'40.149.423.292.13.68.01.03.02'
+                anaTertip = f'40.149.422.291.13.68.01.03.02'
                 nitelik = f'Temel Eğitim Okulları {self.dönem} Dönem Elektrik Ödemesi' ###
                 metin = f'      Müdürlüğümüz  Temel Eğitim Okullarının ({kurumlar}) {self.dönem} dönem {tür} aboneliklerine ait toplam {tutar} borç ödemesi hususunu Onaylarınıza arz ederim.'
                 
@@ -513,7 +513,7 @@ class Fatura():
                 else:
                     kurumlar = f'{len(df_mebbis)} Adet Fatura'
                 icmaller = ", ".join(str(element) for element in df_mebbis_dummy['İCMAL NO'].unique())
-                ihtiyaç = f'TEMEL EĞİTİM OKULLARI {self.dönem} DÖNEM TELEFON ÖDEMESİ {kurumlar} (İcmal No: {icmaller})'
+                ihtiyaç = f'TEMEL EĞİTİM OKULLARI {self.dönem} DÖNEM DOĞALGAZ ÖDEMESİ {kurumlar} (İcmal No: {icmaller})'
                 tekKaynak = {
                     'firma' : df_firma.values[0][1],
                     'tebligat' : df_firma.values[1][1],
@@ -527,8 +527,8 @@ class Fatura():
                 }
                 
                 tür = 'doğalgaz'
-                ilkTertip = f'40.149.423.18734.13.68.01.03.02'
-                anaTertip = f'40.149.422.18735.13.68.01.03.02'
+                ilkTertip = f'40.149.423.292.13.68.01.03.02'
+                anaTertip = f'40.149.422.291.13.68.01.03.02'
                 nitelik = f'Temel Eğitim Okulları {self.dönem} Dönem Doğalgaz Ödemesi' ###
                 metin = f'      Müdürlüğümüz  Temel Eğitim Okullarının ({kurumlar}) {self.dönem} dönem {tür} aboneliklerine ait toplam {tutar} borç ödemesi hususunu Onaylarınıza arz ederim.'
                 
