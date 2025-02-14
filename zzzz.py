@@ -30,6 +30,12 @@ class Fatura():
         #Doğalgaz dosya yolları      
         self.yolFatura_D = r'%s\Doğalgaz\Fatura Listesi.xlsx'%(dosyaYolu)
         self.yolMYS_D = r'%s\Doğalgaz\MYS.xlsx'%(dosyaYolu)  
+        #Su dosya yolları
+        self.yolSuArsiv = r'suArsiv.xlsx'
+        self.yolFatura_S = r'%s\Su\Fatura Listesi.xlsx'%(dosyaYolu)
+        self.ay = ay
+        self.yıl = yıl
+
 
 
 
@@ -172,8 +178,140 @@ class Fatura():
                 }       
 
                 MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()
-                
-Fatura(6,2024).Doğalgaz()
+
+    def Su(self):
+        yolFatura = self.yolFatura_S
+        yolSuArsiv = self.yolSuArsiv
+        yolKurum = self.yolKurum
+        yolİmza = self.yolİmza
+        ay = self.ay
+        yıl = self.yıl
+        
+
+        df_firma = pd.read_excel(io='firma.xlsx',sheet_name='Su', header=0)
+
+        firma = df_firma.values[0][1]
+        faturaTür = 'Su Aboneliği Ödemesi'
+        
+
+
+        warnings.simplefilter(action='ignore', category=UserWarning)
+        
+        if os.path.exists(yolFatura):
+
+            df_imza = pd.read_excel(yolİmza, header=0) #imza dosyasını okuyor
+            imzaListe = [
+                df_imza.values[0][0],
+                df_imza.values[1][0],
+                df_imza.values[0][1],
+                df_imza.values[1][1]
+            ]
+
+            df_suArsiv = pd.read_excel(yolSuArsiv, header=0) #mebbis'ten indirilen abonelik dosyasını okuyor
+            df_suArsiv = df_suArsiv.fillna(0)
+
+            df_mebbis = pd.read_excel(yolFatura, header=0) #mebbis dosyasından verileri çekiyor
+            cols_to_keep_meb = [
+                'KURUM ADI',
+                'ABONE NUMARASI', 
+                'VERGİ NO', 
+                'FATURA NUMARASI', 
+                'FATURA TARİHİ',
+                'İCMAL NO',
+                'TÜKETİM MİKTARI',
+                'FATURA TUTARI'
+            ]
+            df_mebbis = df_mebbis.reindex(cols_to_keep_meb, axis=1)
+            df_mebbis = df_mebbis.drop(df_mebbis.index[-1]) #tablodaki son satırı siliyor
+            print(df_mebbis)
+            #df_mebbis['ABONE NUMARASI']=df_mebbis['ABONE NUMARASI'].astype(float) 
+
+            meb_abo_col = df_mebbis.columns.get_loc('ABONE NUMARASI')
+            su_abo_col = df_suArsiv.columns.get_loc('ABONE NUMARASI')
+            meb_tuk_col = df_mebbis.columns.get_loc('TÜKETİM MİKTARI')
+            
+            for i in range(len(df_mebbis.index)):
+                indices_fatura = np.where(df_suArsiv['ABONE NUMARASI'] == df_mebbis.iat[i,meb_abo_col])
+                row_indices_fatura = indices_fatura[0]
+                if row_indices_fatura.size != 0:
+                    aboNo = df_suArsiv['ABONE NUMARASI'].values == df_mebbis.iat[i,meb_abo_col]
+                    if max(aboNo)==True: 
+                        row_indices_df_mys = np.where(aboNo == True)
+                        #ay kısmına tüketim miktarı işleme
+                        df_suArsiv.iat[row_indices_df_mys[0][0],2*ay+2] = df_mebbis.iat[i,meb_tuk_col]
+                        #sayaç kısmına son tüketim miktarı işleme
+                        df_suArsiv.iat[row_indices_df_mys[0][0],2*ay+3] = df_suArsiv.iat[row_indices_df_mys[0][0],2*ay+1]+df_suArsiv.iat[row_indices_df_mys[0][0],2*ay+2]
+            print(df_suArsiv)           
+                    
+
+            """
+            df_mebbis['VERGİ NO']=df_mebbis['VERGİ NO'].astype(str) #ilerde hata almamak için kolonun veri tipini değiştiriyor
+            df_mebbis['İCMAL NO']=df_mebbis['İCMAL NO'].astype(str) #böylece normalde sayısal veriler kayıpsız şekilde metin olarak saklanabiliyor
+            
+            df_mebbis_dummy = pd.read_excel(yolFatura, header=0, dtype=str) #aynı mebbis dosyasını okuyor ancak vergi no ve icmal metin olarak saklanmalı
+            cols_to_keep_dummy = ['VERGİ NO','İCMAL NO'] #bu veriler sayısal olarak saklanırsa başında 0 varsa siliyor
+            df_mebbis_dummy = df_mebbis_dummy.reindex(cols_to_keep_dummy, axis=1)
+            df_mebbis_dummy = df_mebbis_dummy.drop(df_mebbis_dummy.index[-1])    
+
+            df_kurum = pd.read_excel(yolKurum, dtype=str, header=0) #kurumlar dosyasından verileri çekiyor
+            cols_to_keep_kurum = [
+                        'VERGİ KİMLİK NO', 
+                        'KURUM TÜRÜ'
+                    ]
+            df_kurum = df_kurum.reindex(cols_to_keep_kurum, axis=1)
+            df_kurum =df_kurum.drop(df_kurum.index[-1])
+            df_kurum_ana = df_kurum[df_kurum['KURUM TÜRÜ']=='Okul Öncesi'] #anaokullarını ayırıyor
+            
+            #Tek kaynak formu işlemleri
+            toplam = "{:,.2f}".format(df_mebbis['FATURA TUTARI'].sum())
+            toplam = toplam.replace(',','-')
+            toplam = toplam.replace('.',',')
+            toplam = toplam.replace('-','.')
+            top2 = df_mebbis['FATURA TUTARI'].sum()
+            tutar = f'{toplam} TL ({ParaCevir(top2)})'
+            unik = len(df_mebbis['KURUM ADI'].unique())
+            if unik<4:
+                kurumlar = ", ".join(str(element) for element in df_mebbis['KURUM ADI'].unique())
+            else:
+                kurumlar = f'{len(df_mebbis)} Adet Fatura'
+            icmaller = ", ".join(str(element) for element in df_mebbis_dummy['İCMAL NO'].unique())
+            ihtiyaç = f'TEMEL EĞİTİM OKULLARI {self.dönem} DÖNEM TELEFON ÖDEMESİ {kurumlar} (İcmal No: {icmaller})'
+            tekKaynak = {
+                'firma' : df_firma.values[0][1],
+                'tebligat' : df_firma.values[1][1],
+                'vergi' : df_firma.values[2][1],
+                'telefon' : df_firma.values[3][1],
+                'eposta' : df_firma.values[4][1],
+                'tutar' : tutar,
+                'ihtiyaç' : ihtiyaç,
+                'harcama' : imzaListe[2],
+                'unvan' : imzaListe[3]
+            }
+            
+            tür = 'doğalgaz'
+            ilkTertip = f'40.149.423.18734.13.68.01.03.02'
+            anaTertip = f'40.149.422.18735.13.68.01.03.02'
+            nitelik = f'Temel Eğitim Okulları {self.dönem} Dönem Doğalgaz Ödemesi' ###
+            metin = f'      Müdürlüğümüz  Temel Eğitim Okullarının ({kurumlar}) {self.dönem} dönem {tür} aboneliklerine ait toplam {tutar} borç ödemesi hususunu Onaylarınıza arz ederim.'
+            
+            harcamaTalimatı = {
+                'tarih' : date.today().strftime("%d.%m.%Y"),
+                'tanım' : faturaTür,
+                'nitelik' : nitelik,
+                'miktar' : tutar,
+                'ödenek1' : '',
+                'ödenek2' : '',
+                'metin' : metin,
+                'ilkTertip': ilkTertip,
+                'anaTertip': anaTertip
+            }       
+
+            MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()"""
+
+
+
+
+Fatura(2,2025).Su()
 
 
 
