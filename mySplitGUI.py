@@ -12,7 +12,7 @@ class MainWindow(QWidget):
         
         self.setWindowTitle("LETA Fatura")
         self.setWindowIcon(QIcon('logo.png'))
-        self.setFixedSize(250,480)
+        self.setFixedSize(250,420)
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -20,10 +20,6 @@ class MainWindow(QWidget):
         btnElk = QPushButton(text="Elektrik")
         btnElk.setFixedSize(230, 60)
         btnElk.clicked.connect(lambda: self.elektrikSender())
-
-        btnAdm = QPushButton(text="ADM")
-        btnAdm.setFixedSize(230, 60)
-        btnAdm.clicked.connect(lambda: self.admSender())
         
         btnSu = QPushButton(text="Su")
         btnSu.setFixedSize(230, 60)
@@ -46,7 +42,6 @@ class MainWindow(QWidget):
         
         
         layout.addWidget(btnElk)
-        layout.addWidget(btnAdm)
         layout.addWidget(btnSu)
         layout.addWidget(btnGaz)
         layout.addWidget(btnInt)
@@ -54,17 +49,12 @@ class MainWindow(QWidget):
         layout.addWidget(btnBilgi)
            
     def elektrikSender(self):
-        self.w = Elektrik()
+        self.w = SecElektrik()
         self.w.show()
         self.close()
-    
-    def admSender(self):
-        self.w = ADM()
-        self.w.show()
-        self.close()
-        
+            
     def internetSender(self):
-        self.w = İnternet()
+        self.w = Secİnternet()
         self.w.show()
         self.close()
         
@@ -82,12 +72,12 @@ class MainWindow(QWidget):
         self.w = Bilgi()
         self.w.show()
         self.close()
-        
+     
 class Elektrik(QWidget):
     def __init__(self):
         super().__init__()
         
-        self.setWindowTitle("LETA Fatura")
+        self.setWindowTitle("LETA AYDEM")
         self.setWindowIcon(QIcon('logo.png'))
         self.setFixedSize(250,180)
 
@@ -125,14 +115,13 @@ class Elektrik(QWidget):
 
     
     def the_back_button_was_clicked(self):
-        self.w = MainWindow()
+        self.w = SecElektrik()
         self.w.show()
         self.close()      
         
     def hesapla(self):
         Fatura(self.spinAy.value(),self.spinYıl.value()).Elektrik()
         self.showDialog()
-
 
     def showDialog(self):
         msgBox = QMessageBox(self)
@@ -147,7 +136,7 @@ class ADM(QWidget):
     def __init__(self):
         super().__init__()
         
-        self.setWindowTitle("LETA Fatura")
+        self.setWindowTitle("LETA ADM")
         self.setWindowIcon(QIcon('logo.png'))
         self.setFixedSize(250,180)
 
@@ -185,7 +174,7 @@ class ADM(QWidget):
 
     
     def the_back_button_was_clicked(self):
-        self.w = MainWindow()
+        self.w = SecElektrik()
         self.w.show()
         self.close()      
         
@@ -202,9 +191,52 @@ class ADM(QWidget):
         msgBox.setIcon(QMessageBox.Icon.Information)
 
         returnValue = msgBox.exec()        
+
+class SecElektrik(QWidget):
+    def __init__(self):
+        super().__init__()
         
+        self.setWindowTitle("LETA Elektrik")
+        self.setWindowIcon(QIcon('logo.png'))
+        self.setFixedSize(250,180)
+
+        layout = QVBoxLayout()
+        self.setLayout(layout)
         
+        btnElk = QPushButton(text="AYDEM")
+        btnElk.setFixedSize(230, 60)
+        btnElk.clicked.connect(lambda: self.elektrikSender())
+
+        btnAdm = QPushButton(text="ADM")
+        btnAdm.setFixedSize(230, 60)
+        btnAdm.clicked.connect(lambda: self.admSender())
         
+
+        btnGeri = QPushButton(text='Geri Dön', parent=self)
+        btnGeri.setFixedSize(230, 30)
+        btnGeri.setStyleSheet("background-color : #c8d3fa")
+        btnGeri.clicked.connect(lambda: self.the_back_button_was_clicked())
+
+        layout.addWidget(btnElk)
+        layout.addWidget(btnAdm)
+        layout.addWidget(btnGeri)
+
+    
+    def the_back_button_was_clicked(self):
+        self.w = MainWindow()
+        self.w.show()
+        self.close()      
+
+    def elektrikSender(self):
+        self.w = Elektrik()
+        self.w.show()
+        self.close()
+
+    def admSender(self):
+        self.w = ADM()
+        self.w.show()
+        self.close()
+             
 class İnternet(QWidget):
     def __init__(self):
         super().__init__()
@@ -247,14 +279,13 @@ class İnternet(QWidget):
 
     
     def the_back_button_was_clicked(self):
-        self.w = MainWindow()
+        self.w = Secİnternet()
         self.w.show()
         self.close()      
         
     def hesapla(self):
         Fatura(self.spinAy.value(),self.spinYıl.value()).İnternet()
         self.showDialog()
-
 
     def showDialog(self):
         msgBox = QMessageBox(self)
@@ -263,8 +294,111 @@ class İnternet(QWidget):
         msgBox.setStandardButtons(QMessageBox.StandardButton.Ok)
         msgBox.setIcon(QMessageBox.Icon.Information)
 
-        returnValue = msgBox.exec()        
+        returnValue = msgBox.exec()
+
+class MEMİnternet(QWidget):
+    def __init__(self):
+        super().__init__()
         
+        self.setWindowTitle("LETA Fatura")
+        self.setWindowIcon(QIcon('logo.png'))
+        self.setFixedSize(250,180)
+
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+        
+        self.label1 = QLabel('Ay:',self) 
+        self.label1.setGeometry(15, 0, 110, 40)
+        self.label2 = QLabel('Yıl:',self)
+        self.label2.setGeometry(125, 0, 110, 40)
+        
+        self.spinAy = QSpinBox(self)
+        self.spinAy.setGeometry(10, 30, 110, 40)
+        self.spinAy.setMinimum(1)
+        self.spinAy.setMaximum(12)
+        self.spinAy.setValue(datetime.now().month-1)
+        
+        self.spinYıl = QSpinBox(self)
+        self.spinYıl.setGeometry(120, 30, 110, 40)
+        self.spinYıl.setMinimum(2017)
+        self.spinYıl.setMaximum(2027)
+        self.spinYıl.setValue(datetime.now().year)
+          
+        btnHesapla = QPushButton(text='Hesapla', parent=self)
+        btnHesapla.setFixedSize(230, 30)
+        btnHesapla.setStyleSheet("background-color : #57f752")
+        btnHesapla.move(10,80)
+        btnHesapla.clicked.connect(lambda: self.hesapla())        
+        
+        btnGeri = QPushButton(text='Geri Dön', parent=self)
+        btnGeri.setFixedSize(230, 30)
+        btnGeri.setStyleSheet("background-color : #c8d3fa")
+        btnGeri.move(10,130)
+        btnGeri.clicked.connect(lambda: self.the_back_button_was_clicked())
+
+    
+    def the_back_button_was_clicked(self):
+        self.w = Secİnternet()
+        self.w.show()
+        self.close()      
+        
+    def hesapla(self):
+        Fatura(self.spinAy.value(),self.spinYıl.value()).MEMİnternet()
+        self.showDialog()
+
+    def showDialog(self):
+        msgBox = QMessageBox(self)
+        msgBox.setText("Hesaplama tamamlandı!")
+        msgBox.setWindowTitle("LETA Fatura")
+        msgBox.setStandardButtons(QMessageBox.StandardButton.Ok)
+        msgBox.setIcon(QMessageBox.Icon.Information)
+
+        returnValue = msgBox.exec()
+
+class Secİnternet(QWidget):
+    def __init__(self):
+        super().__init__()
+        
+        self.setWindowTitle("LETA İnternet")
+        self.setWindowIcon(QIcon('logo.png'))
+        self.setFixedSize(250,180)
+
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+        
+        btnTem = QPushButton(text="Temel Eğitim")
+        btnTem.setFixedSize(230, 60)
+        btnTem.clicked.connect(lambda: self.internetSender())
+
+        btnMem = QPushButton(text="İlçe Milli Eğitim")
+        btnMem.setFixedSize(230, 60)
+        btnMem.clicked.connect(lambda: self.admSender())
+        
+
+        btnGeri = QPushButton(text='Geri Dön', parent=self)
+        btnGeri.setFixedSize(230, 30)
+        btnGeri.setStyleSheet("background-color : #c8d3fa")
+        btnGeri.clicked.connect(lambda: self.the_back_button_was_clicked())
+
+        layout.addWidget(btnTem)
+        layout.addWidget(btnMem)
+        layout.addWidget(btnGeri)
+
+    
+    def the_back_button_was_clicked(self):
+        self.w = MainWindow()
+        self.w.show()
+        self.close()      
+
+    def internetSender(self):
+        self.w = İnternet()
+        self.w.show()
+        self.close()
+
+    def admSender(self):
+        self.w = MEMİnternet()
+        self.w.show()
+        self.close()        
         
 class Telefon(QWidget):
     def __init__(self):
