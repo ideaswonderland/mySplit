@@ -520,7 +520,6 @@ class Doğalgaz(QWidget):
 
         returnValue = msgBox.exec()
 
-
 class Bilgi(QWidget):
     def __init__(self):
         super().__init__()

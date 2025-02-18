@@ -12,6 +12,7 @@ class MYS():
                  df_mebbis:pd.DataFrame,
                  df_mebbis_dummy:pd.DataFrame,
                  df_kurum_ana:pd.DataFrame,
+                 df_kurum_mem:pd.DataFrame,
                  firma:str,
                  faturaTür:str,
                  imzaListe:list,
@@ -22,11 +23,13 @@ class MYS():
         
         self.df_ana = pd.DataFrame() #boş dataframe ler oluşturuyor, düzeltilmiş dataframe i ayırıp birleştirecez
         self.df_ilk = pd.DataFrame()
+        self.df_mem = pd.DataFrame()
 
         self.df_mys = df_mys
         self.df_mebbis = df_mebbis
         self.df_mebbis_dummy = df_mebbis_dummy
         self.df_kurum_ana = df_kurum_ana
+        self.df_kurum_mem = df_kurum_mem
         self.firma = firma
         self.faturaTür = faturaTür
         self.imzaListe = imzaListe
@@ -67,8 +70,9 @@ class MYS():
             row_indices_fatura = indices_fatura[0] #faturaların mys dosyasındaki konumunu buluyor
             if row_indices_fatura.size == 0: #Fatura numarasının mys dosyasında olup olmadığını kontrol ediyor
                 aboneNo = self.df_mys['Abone'].values == self.df_mebbis.iat[i,self.meb_abo_col] #Fatura numarası mys dosyasında yoksa abone numarasını buluyor.
-                if max(aboneNo)==True: #abone numarasının mys dosyasında olup olmadığını kontrol ediyor
-                    row_indices_df_mys = np.where(aboneNo == True) #Abone numarasının hangi sırada olduğunu buluyor
+                tarKontrol = self.df_mys['Tarih'].values == self.df_mebbis.iat[i,self.meb_tar_col]
+                if max(aboneNo)==True and max(tarKontrol)==True: #abone numarasının mys dosyasında olup olmadığını kontrol ediyor
+                    row_indices_df_mys = np.where((aboneNo == True)&(tarKontrol == True)) #Abone numarasının hangi sırada olduğunu buluyor
                     #Tutar ve fatura tarihi kontrolü
                     if self.df_mebbis.iat[i,self.meb_tut_col] == self.df_mys.iat[row_indices_df_mys[0][0],self.mys_tut_col] and self.df_mebbis.iat[i,self.meb_tar_col] == self.df_mys.iat[row_indices_df_mys[0][0],self.mys_tar_col]:
                         #Tutar ve tarih iki tabloda da aynı ise mys'deki fatura numarasını alıyor
@@ -76,7 +80,7 @@ class MYS():
                     else: #tutar ve tarih tutmuyorsa fatura girişi hatalı demektir 
                         print(f'{self.df_mebbis.iat[i,self.meb_fat_col]} Fatura girişi hatalı!')
                 else: #abone numarası yoksa zaten mys'de yok demektir
-                    print(f'{self.df_mebbis.iat[i,self.meb_fat_col]} MYS de yok!')                      
+                    print(f'Fatura listesinde {i+2}. satırda yer alan {self.df_mebbis.iat[i,self.meb_fat_col]} MYS de yok!')                      
             else:
                 #fatura var ancak tutarlar farklı ise tutarı mys'den çekiyor
                 if self.df_mebbis.iat[i, self.meb_tut_col] != self.df_mys.iat[row_indices_fatura[0],self.mys_tut_col]:
@@ -90,6 +94,8 @@ class MYS():
             if self.df_kurum_ana.isin([self.df_mebbis.iat[i,self.meb_ver_col]]).any().any():
                 #anaokulları içerisindeyse anaokulu dataframe ine ekliyor
                 self.df_ana = pd.concat([self.df_ana,self.df_mebbis.iloc[[i]]])
+            elif self.df_kurum_mem.isin([self.df_mebbis.iat[i,self.meb_ver_col]]).any().any():
+                self.df_mem = pd.concat([self.df_mem,self.df_mebbis.iloc[[i]]])
             else:
                 #değilse ilkokullar dataframe ine ekliyor
                 self.df_ilk = pd.concat([self.df_ilk,self.df_mebbis.iloc[[i]]])
@@ -101,59 +107,78 @@ class MYS():
 
         başlangıç = 5
 
-        if self.df_ilk.empty:
-            toplam_ilk = 0
-            if self.df_ana.empty:
-                toplam_ana = 0
-                pass
+        if self.df_mem.empty:
+            toplam_mem = 0
+            if self.df_ilk.empty:
+                toplam_ilk = 0
+                if self.df_ana.empty:
+                    toplam_ana = 0
+                    pass
+                else:
+                    toplam_ana = self.df_ana['FATURA TUTARI'].sum()
+                    self.işle(wb,self.df_ana,başlangıç)
+                    başlangıç += len(self.df_ana)
+                    ws['L6'] = f'=SUM(I{başlangıç-len(self.df_ana)}:I{başlangıç-1})' ####
+                    ws.cell(row=başlangıç, column=1).value = 'ANAOKULLARI TOPLAMI'
+                    Hizala.SağdaKalın(wb,başlangıç,1)
+                    ws.merge_cells(f'A{başlangıç}:G{başlangıç}')
+                    ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ana
+                    Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)   
+                    ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00'
+                    ws['M6'] = f'=H{başlangıç}-L6' ###     
+                    başlangıç += 1
             else:
-                toplam_ana = self.df_ana['FATURA TUTARI'].sum()
-                self.işle(wb,self.df_ana,başlangıç)
-                başlangıç += len(self.df_ana)
-                ws['L6'] = f'=SUM(I{başlangıç-len(self.df_ana)}:I{başlangıç-1})' ####
-                ws.cell(row=başlangıç, column=1).value = 'ANAOKULLARI TOPLAMI'
+                toplam_ilk = self.df_ilk['FATURA TUTARI'].sum()
+                self.işle(wb, self.df_ilk,başlangıç)
+                başlangıç += len(self.df_ilk)
+                ws['L5'] = f'=SUM(I5:I{başlangıç-1})' ####
+                
+                ws.cell(row=başlangıç, column=1).value = 'İLKÖĞRETİM TOPLAMI'
                 Hizala.SağdaKalın(wb,başlangıç,1)
                 ws.merge_cells(f'A{başlangıç}:G{başlangıç}')
-                ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ana
-                Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)   
+                ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ilk
+                Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)
                 ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00'
-                ws['M6'] = f'=H{başlangıç}-L6' ###     
+                ws['M5'] = f'=H{başlangıç}-L5' ###
                 başlangıç += 1
+                
+                if self.df_ana.empty:
+                    toplam_ana = 0
+                else:
+                    toplam_ana = self.df_ana['FATURA TUTARI'].sum()
+                    self.işle(wb,self.df_ana,başlangıç)
+                    başlangıç +=len(self.df_ana)
+                    ws['L6'] = f'=SUM(I{başlangıç-len(self.df_ana)}:I{başlangıç-1})' ####
+                    ws.cell(row=başlangıç, column=1).value = 'ANAOKULLARI TOPLAMI'
+                    Hizala.SağdaKalın(wb,başlangıç,1)
+                    ws.merge_cells(f'A{başlangıç}:G{başlangıç}')
+                    ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ana
+                    Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)   
+                    ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00'
+                    ws['M6'] = f'=H{başlangıç}-L6' ###             
+                    başlangıç +=1
         else:
-            toplam_ilk = self.df_ilk['FATURA TUTARI'].sum()
-            self.işle(wb, self.df_ilk,başlangıç)
-            başlangıç += len(self.df_ilk)
-            ws['L5'] = f'=SUM(I5:I{başlangıç-1})' ####
-            
-            ws.cell(row=başlangıç, column=1).value = 'İLKÖĞRETİM TOPLAMI'
+            toplam_ilk = 0
+            toplam_ana = 0
+            toplam_mem = self.df_mem['FATURA TUTARI'].sum()
+            self.işle(wb,self.df_mem,başlangıç)
+            başlangıç +=len(self.df_mem)
+            ws['A1'] = f'SULTANHİSAR İLÇE MİLLİ EĞİTİM MÜDÜRLÜĞÜ FATURA LİSTESİ'
+            ws['L6'] = f'=SUM(I{başlangıç-len(self.df_mem)}:I{başlangıç-1})' ####
+            ws.cell(row=başlangıç, column=1).value = 'İLÇE MİLLİ EĞİTİM MÜDÜRLÜĞÜ TOPLAMI'
             Hizala.SağdaKalın(wb,başlangıç,1)
             ws.merge_cells(f'A{başlangıç}:G{başlangıç}')
-            ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ilk
-            Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)
+            ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_mem
+            Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)   
             ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00'
-            ws['M5'] = f'=H{başlangıç}-L5' ###
-            başlangıç += 1
+            ws['M6'] = f'=H{başlangıç}-L6' ###             
+            başlangıç +=1
             
-            if self.df_ana.empty:
-                toplam_ana = 0
-            else:
-                toplam_ana = self.df_ana['FATURA TUTARI'].sum()
-                self.işle(wb,self.df_ana,başlangıç)
-                başlangıç +=len(self.df_ana)
-                ws['L6'] = f'=SUM(I{başlangıç-len(self.df_ana)}:I{başlangıç-1})' ####
-                ws.cell(row=başlangıç, column=1).value = 'ANAOKULLARI TOPLAMI'
-                Hizala.SağdaKalın(wb,başlangıç,1)
-                ws.merge_cells(f'A{başlangıç}:G{başlangıç}')
-                ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ana
-                Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)   
-                ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00'
-                ws['M6'] = f'=H{başlangıç}-L6' ###             
-                başlangıç +=1
                 
         ws.cell(row=başlangıç, column=1).value = 'GENEL TOPLAM'
         Hizala.SağdaKalın(wb,başlangıç,1)
         ws.merge_cells(f'A{başlangıç}:G{başlangıç}')      
-        ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ilk + toplam_ana
+        ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ilk + toplam_ana + toplam_mem
         Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)   
         ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00'   
         başlangıç += 4
@@ -191,6 +216,7 @@ class MYS():
     
         ilk = toplam_ilk
         ana = toplam_ana
+        mem = toplam_mem
         
         ilkT = '{:,.2f}'.format(ilk)
         ilkT = ilkT.replace(',','-')
@@ -202,17 +228,28 @@ class MYS():
         anaT = anaT.replace('.',',')
         anaT = anaT.replace('-','.')
         
+        memT = '{:,.2f}'.format(mem)
+        memT = memT.replace(',','-')
+        memT = memT.replace('.',',')
+        memT = memT.replace('-','.')
+        
         ilkTertip = harcamaTalimatı['ilkTertip']
         anaTertip = harcamaTalimatı['anaTertip']
+        memTertip = harcamaTalimatı['memTertip']
         
         ilkS = f'{ilkTertip} ({ilkT} TL)'
         anaS = f'{anaTertip} ({anaT} TL)'
+        memS = f'{memTertip} ({memT} TL)'
         
-        if ilk == 0:
-            ilkS = anaS
-            anaS = ''
-        if ana == 0:
-            anaS = ''
+        if mem == 0:
+            if ilk == 0:
+                ilkS = anaS
+                anaS = ''
+            if ana == 0:
+                anaS = ''
+        else:
+            ilkS = memS
+            anaS=''
             
         self.harcamaTalimatı['ödenek1'] = ilkS
         self.harcamaTalimatı['ödenek2'] = anaS

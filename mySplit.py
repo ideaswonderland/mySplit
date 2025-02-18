@@ -116,6 +116,7 @@ class Fatura():
                 df_kurum = df_kurum.reindex(cols_to_keep_kurum, axis=1)
                 df_kurum =df_kurum.drop(df_kurum.index[-1])
                 df_kurum_ana = df_kurum[df_kurum['KURUM TÜRÜ']=='Okul Öncesi'] #anaokullarını ayırıyor
+                df_kurum_mem = df_kurum[df_kurum['KURUM TÜRÜ']=='MEM'] #MEM'i ayırıyor
                 
                 #Tek kaynak formu işlemleri
                 toplam = "{:,.2f}".format(df_mebbis['FATURA TUTARI'].sum())
@@ -148,6 +149,7 @@ class Fatura():
                 tür = 'elektrik'
                 ilkTertip = f'40.149.423.292.13.68.01.03.02'
                 anaTertip = f'40.149.422.291.13.68.01.03.02'
+                memTertip = f'98.900.9006.306.13.67.01.03.02'
                 nitelik = f'Temel Eğitim Okulları {self.dönem} Dönem Elektrik Ödemesi' ###
                 metin = f'      Müdürlüğümüz  Temel Eğitim Okullarının ({kurumlar}) {self.dönem} dönem {tür} aboneliklerine ait toplam {tutar} borç ödemesi hususunu Onaylarınıza arz ederim.'
                 
@@ -160,11 +162,12 @@ class Fatura():
                     'ödenek2' : '',
                     'metin' : metin,
                     'ilkTertip': ilkTertip,
-                    'anaTertip': anaTertip
+                    'anaTertip': anaTertip,
+                    'memTertip': memTertip
                 }                
                 
 
-                MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()
+                MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, df_kurum_mem, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()
 
     def ADM(self):
         yolFatura = self.yolFatura_A
@@ -244,6 +247,7 @@ class Fatura():
                 df_kurum = df_kurum.reindex(cols_to_keep_kurum, axis=1)
                 df_kurum =df_kurum.drop(df_kurum.index[-1])
                 df_kurum_ana = df_kurum[df_kurum['KURUM TÜRÜ']=='Okul Öncesi'] #anaokullarını ayırıyor
+                df_kurum_mem = df_kurum[df_kurum['KURUM TÜRÜ']=='MEM'] #MEM'i ayırıyor
                 
                 #Tek kaynak formu işlemleri
                 toplam = "{:,.2f}".format(df_mebbis['FATURA TUTARI'].sum())
@@ -276,6 +280,7 @@ class Fatura():
                 tür = 'elektrik'
                 ilkTertip = f'40.149.423.292.13.68.01.03.02'
                 anaTertip = f'40.149.422.291.13.68.01.03.02'
+                memTertip = f'98.900.9006.306.13.67.01.03.02'
                 nitelik = f'Temel Eğitim Okulları {self.dönem} Dönem Elektrik Ödemesi' ###
                 metin = f'      Müdürlüğümüz  Temel Eğitim Okullarının ({kurumlar}) {self.dönem} dönem {tür} aboneliklerine ait toplam {tutar} borç ödemesi hususunu Onaylarınıza arz ederim.'
                 
@@ -288,11 +293,12 @@ class Fatura():
                     'ödenek2' : '',
                     'metin' : metin,
                     'ilkTertip': ilkTertip,
-                    'anaTertip': anaTertip
+                    'anaTertip': anaTertip,
+                    'memTertip': memTertip
                 }                
                 
 
-                MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()            
+                MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, df_kurum_mem, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()            
                 
     def İnternet(self):
         yolFatura = self.yolFatura_I
@@ -370,6 +376,7 @@ class Fatura():
                 df_kurum = df_kurum.reindex(cols_to_keep_kurum, axis=1)
                 df_kurum =df_kurum.drop(df_kurum.index[-1])
                 df_kurum_ana = df_kurum[df_kurum['KURUM TÜRÜ']=='Okul Öncesi'] #anaokullarını ayırıyor
+                df_kurum_mem = df_kurum[df_kurum['KURUM TÜRÜ']=='MEM'] #MEM'i ayırıyor
                 
                 #Tek kaynak formu işlemleri
                 toplam = "{:,.2f}".format(df_mebbis['FATURA TUTARI'].sum())
@@ -400,6 +407,7 @@ class Fatura():
                 tür = 'internet'
                 ilkTertip = f'40.149.423.292.13.68.01.03.05'
                 anaTertip = f'40.149.422.291.13.68.01.03.05'
+                memTertip = f'98.900.9006.306.13.67.01.03.05'
                 nitelik = f'Temel Eğitim Okulları {self.dönem} Dönem İnternet Ödemesi' ###
                 metin = f'      Müdürlüğümüz  Temel Eğitim Okullarının ({kurumlar}) {self.dönem} dönem {tür} aboneliklerine ait toplam {tutar} borç ödemesi hususunu Onaylarınıza arz ederim.'
                 
@@ -412,10 +420,11 @@ class Fatura():
                     'ödenek2' : '',
                     'metin' : metin,
                     'ilkTertip': ilkTertip,
-                    'anaTertip': anaTertip
+                    'anaTertip': anaTertip,
+                    'memTertip': memTertip
                 }       
 
-                MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()
+                MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, df_kurum_mem, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()
 
     def MEMİnternet(self):
         yolFatura = self.yolFatura_MI
@@ -499,6 +508,7 @@ class Fatura():
                         ]
                 df_kurum = df_kurum.reindex(cols_to_keep_kurum, axis=1)
                 df_kurum =df_kurum.drop(df_kurum.index[-1])
+                df_kurum_ana = df_kurum[df_kurum['KURUM TÜRÜ']=='Okul Öncesi'] #anaokullarını ayırıyor
                 df_kurum_mem = df_kurum[df_kurum['KURUM TÜRÜ']=='MEM'] #MEM'i ayırıyor
                 
                 #Tek kaynak formu işlemleri
@@ -529,6 +539,7 @@ class Fatura():
                 
                 tür = 'internet'
                 ilkTertip = f'40.149.423.292.13.68.01.03.05'
+                anaTertip = f'40.149.422.291.13.68.01.03.05'
                 memTertip = f'98.900.9006.306.13.67.01.03.05'
                 nitelik = f'İlçe Milli Eğitim Müdürlüğü {self.dönem} Dönem İnternet Ödemesi' ###
                 metin = f'      Müdürlüğümüze ait {self.dönem} dönem {tür} abonelikleri toplam {tutar} borç ödemesi hususunu Onaylarınıza arz ederim.'
@@ -542,10 +553,11 @@ class Fatura():
                     'ödenek2' : '',
                     'metin' : metin,
                     'ilkTertip': ilkTertip,
-                    'anaTertip': memTertip
+                    'anaTertip': anaTertip,
+                    'memTertip': memTertip
                 }       
 
-                MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_mem, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()
+                MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, df_kurum_mem, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()
 
     def Telefon(self):
         yolFatura = self.yolFatura_T
@@ -624,6 +636,7 @@ class Fatura():
                 df_kurum = df_kurum.reindex(cols_to_keep_kurum, axis=1)
                 df_kurum =df_kurum.drop(df_kurum.index[-1])
                 df_kurum_ana = df_kurum[df_kurum['KURUM TÜRÜ']=='Okul Öncesi'] #anaokullarını ayırıyor
+                df_kurum_mem = df_kurum[df_kurum['KURUM TÜRÜ']=='MEM'] #MEM'i ayırıyor
                 
                 #Tek kaynak formu işlemleri
                 toplam = "{:,.2f}".format(df_mebbis['FATURA TUTARI'].sum())
@@ -654,6 +667,7 @@ class Fatura():
                 tür = 'telefon'
                 ilkTertip = f'40.149.423.292.13.68.01.03.05'
                 anaTertip = f'40.149.422.291.13.68.01.03.05'
+                memTertip = f'98.900.9006.306.13.67.01.03.05'
                 nitelik = f'Temel Eğitim Okulları {self.dönem} Dönem Telefon Ödemesi' ###
                 metin = f'      Müdürlüğümüz  Temel Eğitim Okullarının ({kurumlar}) {self.dönem} dönem {tür} aboneliklerine ait toplam {tutar} borç ödemesi hususunu Onaylarınıza arz ederim.'
                 
@@ -666,11 +680,12 @@ class Fatura():
                     'ödenek2' : '',
                     'metin' : metin,
                     'ilkTertip': ilkTertip,
-                    'anaTertip': anaTertip
+                    'anaTertip': anaTertip,
+                    'memTertip': memTertip
                 }       
 
 
-                MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()
+                MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, df_kurum_mem, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()
 
     def Doğalgaz(self):
         yolFatura = self.yolFatura_D
@@ -763,6 +778,7 @@ class Fatura():
                 df_kurum = df_kurum.reindex(cols_to_keep_kurum, axis=1)
                 df_kurum =df_kurum.drop(df_kurum.index[-1])
                 df_kurum_ana = df_kurum[df_kurum['KURUM TÜRÜ']=='Okul Öncesi'] #anaokullarını ayırıyor
+                df_kurum_mem = df_kurum[df_kurum['KURUM TÜRÜ']=='MEM'] #MEM'i ayırıyor
                 
                 #Tek kaynak formu işlemleri
                 toplam = "{:,.2f}".format(df_mebbis['FATURA TUTARI'].sum())
@@ -793,6 +809,7 @@ class Fatura():
                 tür = 'doğalgaz'
                 ilkTertip = f'40.149.423.292.13.68.01.03.02'
                 anaTertip = f'40.149.422.291.13.68.01.03.02'
+                memTertip = f'98.900.9006.306.13.67.01.03.02'
                 nitelik = f'Temel Eğitim Okulları {self.dönem} Dönem Doğalgaz Ödemesi' ###
                 metin = f'      Müdürlüğümüz  Temel Eğitim Okullarının ({kurumlar}) {self.dönem} dönem {tür} aboneliklerine ait toplam {tutar} borç ödemesi hususunu Onaylarınıza arz ederim.'
                 
@@ -805,10 +822,11 @@ class Fatura():
                     'ödenek2' : '',
                     'metin' : metin,
                     'ilkTertip': ilkTertip,
-                    'anaTertip': anaTertip
+                    'anaTertip': anaTertip,
+                    'memTertip': memTertip
                 }       
 
-                MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()
+                MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, df_kurum_mem, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()
 
 
 
