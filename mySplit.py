@@ -74,14 +74,14 @@ class Fatura():
                 ]
                 df_mys = df_mys.reindex(cols_to_keep_mys, axis=1) #mys dosyasından verileri çekiyor
                 df_mys[['VKN', 'Okul']] = df_mys['Harcama Birimi'].str.split('-', expand=True) #Harcama Birimi kısmını VKN ve Okul olarak ayırıyor
-                df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
-                df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
+                #df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
+                #df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
+                df_mys['Tarih'] = df_mys['Fatura Tarihi'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
                 df_mys[['Sayaç No','Müşteri No','Tesisat No','Abone']]=df_mys['Müşteri Kimlik Bilgisi'].str.split('-', expand=True) #Müşteri kimlik bilgisi kısmını bölüyor
                 df_mys['Abone']=df_mys['Abone'].astype(int) #abone numaralarını mebbis dosyasıyla eşlemek için tam sayı haline getiriyor
                 #gereksiz sütunları temizliyor
                 df_mys = df_mys.drop(columns=['Harcama Birimi',
                                             'Fatura Tarihi',
-                                            'Boş',
                                             'Müşteri Kimlik Bilgisi',
                                             'Sayaç No',
                                             'Müşteri No',
@@ -181,7 +181,7 @@ class Fatura():
         df_firma = pd.read_excel(io='firma.xlsx',sheet_name='ADM', header=0)
 
         firma = df_firma.values[0][1]
-        faturaTür = 'Elektrik Aboneliği Ödemesi'
+        faturaTür = 'ADM Elektrik Aboneliği Ödemesi'
 
         warnings.simplefilter(action='ignore', category=UserWarning)
         
@@ -205,19 +205,19 @@ class Fatura():
                 ]
                 df_mys = df_mys.reindex(cols_to_keep_mys, axis=1) #mys dosyasından verileri çekiyor
                 df_mys[['VKN', 'Okul']] = df_mys['Harcama Birimi'].str.split('-', expand=True) #Harcama Birimi kısmını VKN ve Okul olarak ayırıyor
-                df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
-                df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
-                df_mys[['Sayaç No','Müşteri No','Tesisat No','Abone']]=df_mys['Müşteri Kimlik Bilgisi'].str.split('-', expand=True) #Müşteri kimlik bilgisi kısmını bölüyor
-                df_mys['Abone']=df_mys['Abone'].astype(int) #abone numaralarını mebbis dosyasıyla eşlemek için tam sayı haline getiriyor
+                #df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
+                #df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
+                df_mys['Tarih'] = df_mys['Fatura Tarihi'].str.replace('-', '/')
+                #df_mys[['Sayaç No','Müşteri No','Tesisat No','Abone']]=df_mys['Müşteri Kimlik Bilgisi'].str.split('-', expand=True) #Müşteri kimlik bilgisi kısmını bölüyor
+                #df_mys['Abone']=df_mys['Abone'].astype(int) #abone numaralarını mebbis dosyasıyla eşlemek için tam sayı haline getiriyor
+                df_mys['Abone'] = 100207225527
+                df_mys['Abone']=df_mys['Abone'].astype(float)
+
                 #gereksiz sütunları temizliyor
-                df_mys = df_mys.drop(columns=['Harcama Birimi',
+                """df_mys = df_mys.drop(columns=['Harcama Birimi',
                                             'Fatura Tarihi',
-                                            'Boş',
                                             'Müşteri Kimlik Bilgisi',
-                                            'Sayaç No',
-                                            'Müşteri No',
-                                            'Tesisat No',
-                                            'Okul'])
+                                            'Okul'])"""
                 df_mys = df_mys[['Fatura No','Ödenecek Tutar','Tarih','Abone','VKN']]
 
                 df_mebbis = pd.read_excel(yolFatura, header=0) #mebbis dosyasından verileri çekiyor
@@ -336,14 +336,14 @@ class Fatura():
                 ]
                 df_mys = df_mys.reindex(cols_to_keep_mys, axis=1) #mys dosyasından verileri çekiyor
                 df_mys[['VKN', 'Okul']] = df_mys['Harcama Birimi'].str.split('-', expand=True) #Harcama Birimi kısmını VKN ve Okul olarak ayırıyor
-                df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
-                df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
+                #df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
+                #df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
+                df_mys['Tarih'] = df_mys['Fatura Tarihi'].str.replace('-', '/')
                 df_mys[['Hizmet No','Abone']]=df_mys['Müşteri Kimlik Bilgisi'].str.split('-', expand=True) #Müşteri kimlik bilgisi kısmını bölüyor
                 df_mys['Abone']=df_mys['Abone'].astype(float) #abone numaralarını mebbis dosyasıyla eşlemek için tam sayı haline getiriyor
                 #gereksiz sütunları temizliyor
                 df_mys = df_mys.drop(columns=['Harcama Birimi',
                                             'Fatura Tarihi',
-                                            'Boş',
                                             'Müşteri Kimlik Bilgisi',
                                             'Hizmet No',
                                             'Okul'])
@@ -462,14 +462,14 @@ class Fatura():
                 ]
                 df_mys = df_mys.reindex(cols_to_keep_mys, axis=1) #mys dosyasından verileri çekiyor
                 df_mys[['VKN', 'Okul']] = df_mys['Harcama Birimi'].str.split('-', expand=True) #Harcama Birimi kısmını VKN ve Okul olarak ayırıyor
-                df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
-                df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
+                #df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
+                #df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
+                df_mys['Tarih'] = df_mys['Fatura Tarihi'].str.replace('-', '/')
                 df_mys[['Hizmet No','Abone']]=df_mys['Müşteri Kimlik Bilgisi'].str.split('-', expand=True) #Müşteri kimlik bilgisi kısmını bölüyor
                 df_mys['Abone']=df_mys['Abone'].astype(float) #abone numaralarını mebbis dosyasıyla eşlemek için tam sayı haline getiriyor
                 #gereksiz sütunları temizliyor
                 df_mys = df_mys.drop(columns=['Harcama Birimi',
                                             'Fatura Tarihi',
-                                            'Boş',
                                             'Müşteri Kimlik Bilgisi',
                                             'Hizmet No',
                                             'Okul'])
@@ -595,15 +595,15 @@ class Fatura():
                 ]
                 df_mys = df_mys.reindex(cols_to_keep_mys, axis=1) #mys dosyasından verileri çekiyor
                 df_mys[['VKN', 'Okul']] = df_mys['Harcama Birimi'].str.split('-', expand=True) #Harcama Birimi kısmını VKN ve Okul olarak ayırıyor
-                df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
-                df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
+                #df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
+                #df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
+                df_mys['Tarih'] = df_mys['Fatura Tarihi'].str.replace('-', '/')
                 df_mys[['Hizmet No','Abone']]=df_mys['Müşteri Kimlik Bilgisi'].str.split('-', expand=True) #Müşteri kimlik bilgisi kısmını bölüyor
                 df_mys['Abone'] = df_mys['Abone'].str.replace(" ","")
                 df_mys['Abone']=df_mys['Abone'].astype(float) #abone numaralarını mebbis dosyasıyla eşlemek için tam sayı haline getiriyor
                 #gereksiz sütunları temizliyor
                 df_mys = df_mys.drop(columns=['Harcama Birimi',
                                             'Fatura Tarihi',
-                                            'Boş',
                                             'Müşteri Kimlik Bilgisi',
                                             'Hizmet No',
                                             'Okul'])
@@ -723,15 +723,15 @@ class Fatura():
                 ]
                 df_mys = df_mys.reindex(cols_to_keep_mys, axis=1) #mys dosyasından verileri çekiyor
                 df_mys[['VKN', 'Okul']] = df_mys['Harcama Birimi'].str.split('-', expand=True) #Harcama Birimi kısmını VKN ve Okul olarak ayırıyor
-                df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
-                df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
+                #df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
+                #df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
+                df_mys['Tarih'] = df_mys['Fatura Tarihi'].str.replace('-', '/')
                 df_mys[['Hizmet No','Abone']]=df_mys['Müşteri Kimlik Bilgisi'].str.split('-', expand=True) #Müşteri kimlik bilgisi kısmını bölüyor
                 df_mys['Abone'] = df_mys['Abone'].str.replace(" ","")
                 df_mys['Abone']=df_mys['Abone'].astype(float) #abone numaralarını mebbis dosyasıyla eşlemek için tam sayı haline getiriyor
                 #gereksiz sütunları temizliyor
                 df_mys = df_mys.drop(columns=['Harcama Birimi',
                                             'Fatura Tarihi',
-                                            'Boş',
                                             'Müşteri Kimlik Bilgisi',
                                             'Hizmet No',
                                             'Okul'])
@@ -857,14 +857,13 @@ class Fatura():
                 ]
                 df_mys = df_mys.reindex(cols_to_keep_mys, axis=1) #mys dosyasından verileri çekiyor
                 df_mys[['VKN', 'Okul']] = df_mys['Harcama Birimi'].str.split('-', expand=True) #Harcama Birimi kısmını VKN ve Okul olarak ayırıyor
-                df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
-                df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
+                #df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
+                df_mys['Tarih'] = df_mys['Fatura Tarihi'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
                 df_mys['Abone']="" #Boş bir abone sütunu açıyor
 
                 #gereksiz sütunları temizliyor
                 df_mys = df_mys.drop(columns=['Harcama Birimi',
                                             'Fatura Tarihi',
-                                            'Boş',
                                             'Müşteri Kimlik Bilgisi',
                                             'Okul'])
                 df_mys = df_mys[['Fatura No','Ödenecek Tutar','Tarih','Abone','VKN']]
