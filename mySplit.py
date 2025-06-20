@@ -561,6 +561,10 @@ class Fatura():
                 }       
 
                 MYS(df_mys,df_mebbis,df_mebbis_dummy, df_kurum_ana, df_kurum_mem, firma, faturaTür, imzaListe, dosyaYolu, tekKaynak, harcamaTalimatı).MYS()
+            else:
+                print('MYS Listesi Bulunamadı!')
+        else:
+            print('Fatura Listesi Bulunamadı!')
 
     def Telefon(self):
         yolFatura = self.yolFatura_T
