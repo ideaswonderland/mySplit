@@ -86,7 +86,7 @@ class MYS():
                 if self.df_mebbis.iat[i, self.meb_tut_col] != self.df_mys.iat[row_indices_fatura[0],self.mys_tut_col]:
                     self.df_mebbis.iat[i, self.meb_tut_col] = self.df_mys.iat[row_indices_fatura[0],self.mys_tut_col]
                     #tutar değişimi olursa uyarı veriyor, hangi faturanın tutarı nasıl değişmiş görebiliyoruz
-                    print(f'{self.df_mebbis.iat[i, self.meb_fat_col]} numaralı fatura tutarı {self.df_mebbis.iat[i, self.eb_tut_col]} iken {self.df_mys.iat[row_indices_fatura[0],self.mys_tut_col]} oldu.')
+                    print(f'{self.df_mebbis.iat[i, self.meb_fat_col]} numaralı fatura tutarı {self.df_mebbis.iat[i, self.meb_tut_col]} iken {self.df_mys.iat[row_indices_fatura[0],self.mys_tut_col]} oldu.')
             #vergi numarasını metin haline getiriyor böylece başta 0 varsa yoksaymıyor
             self.df_mebbis.iat[i,self.meb_ver_col] = self.df_mebbis_dummy.iat[i,self.mebD_ver_col]
             self.df_mebbis.iat[i,self.meb_icm_col] = self.df_mebbis_dummy.iat[i,self.mebD_icm_col]
@@ -100,9 +100,9 @@ class MYS():
                 #değilse ilkokullar dataframe ine ekliyor
                 self.df_ilk = pd.concat([self.df_ilk,self.df_mebbis.iloc[[i]]])
 
-        ws.cell(row=2,column=2).value = self.faturaTür
+        ws.cell(row=2,column=2).value = self.faturaTür # type: ignore
         Hizala.Solda(self.wb,2,2)
-        ws.cell(row=3,column=2).value = self.firma
+        ws.cell(row=3,column=2).value = self.firma # type: ignore
         Hizala.Solda(wb,3,2)
 
         başlangıç = 5
@@ -119,12 +119,12 @@ class MYS():
                     self.işle(wb,self.df_ana,başlangıç)
                     başlangıç += len(self.df_ana)
                     ws['L6'] = f'=SUM(I{başlangıç-len(self.df_ana)}:I{başlangıç-1})' ####
-                    ws.cell(row=başlangıç, column=1).value = 'ANAOKULLARI TOPLAMI'
+                    ws.cell(row=başlangıç, column=1).value = 'ANAOKULLARI TOPLAMI' # type: ignore
                     Hizala.SağdaKalın(wb,başlangıç,1)
                     ws.merge_cells(f'A{başlangıç}:G{başlangıç}')
-                    ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ana
-                    Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)   
-                    ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00'
+                    ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ana # type: ignore
+                    Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)    # type: ignore
+                    ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00' # type: ignore
                     ws['M6'] = f'=H{başlangıç}-L6' ###     
                     başlangıç += 1
             else:
@@ -133,12 +133,12 @@ class MYS():
                 başlangıç += len(self.df_ilk)
                 ws['L5'] = f'=SUM(I5:I{başlangıç-1})' ####
                 
-                ws.cell(row=başlangıç, column=1).value = 'İLKÖĞRETİM TOPLAMI'
+                ws.cell(row=başlangıç, column=1).value = 'İLKÖĞRETİM TOPLAMI' # type: ignore
                 Hizala.SağdaKalın(wb,başlangıç,1)
                 ws.merge_cells(f'A{başlangıç}:G{başlangıç}')
-                ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ilk
-                Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)
-                ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00'
+                ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ilk # type: ignore
+                Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1) # type: ignore
+                ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00' # type: ignore
                 ws['M5'] = f'=H{başlangıç}-L5' ###
                 başlangıç += 1
                 
@@ -149,12 +149,12 @@ class MYS():
                     self.işle(wb,self.df_ana,başlangıç)
                     başlangıç +=len(self.df_ana)
                     ws['L6'] = f'=SUM(I{başlangıç-len(self.df_ana)}:I{başlangıç-1})' ####
-                    ws.cell(row=başlangıç, column=1).value = 'ANAOKULLARI TOPLAMI'
+                    ws.cell(row=başlangıç, column=1).value = 'ANAOKULLARI TOPLAMI' # type: ignore
                     Hizala.SağdaKalın(wb,başlangıç,1)
                     ws.merge_cells(f'A{başlangıç}:G{başlangıç}')
-                    ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ana
-                    Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)   
-                    ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00'
+                    ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ana # type: ignore
+                    Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)    # type: ignore
+                    ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00' # type: ignore
                     ws['M6'] = f'=H{başlangıç}-L6' ###             
                     başlangıç +=1
         else:
@@ -165,22 +165,22 @@ class MYS():
             başlangıç +=len(self.df_mem)
             ws['A1'] = f'SULTANHİSAR İLÇE MİLLİ EĞİTİM MÜDÜRLÜĞÜ FATURA LİSTESİ'
             ws['L6'] = f'=SUM(I{başlangıç-len(self.df_mem)}:I{başlangıç-1})' ####
-            ws.cell(row=başlangıç, column=1).value = 'İLÇE MİLLİ EĞİTİM MÜDÜRLÜĞÜ TOPLAMI'
+            ws.cell(row=başlangıç, column=1).value = 'İLÇE MİLLİ EĞİTİM MÜDÜRLÜĞÜ TOPLAMI' # type: ignore
             Hizala.SağdaKalın(wb,başlangıç,1)
             ws.merge_cells(f'A{başlangıç}:G{başlangıç}')
-            ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_mem
-            Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)   
-            ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00'
+            ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_mem # type: ignore
+            Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)    # type: ignore
+            ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00' # type: ignore
             ws['M6'] = f'=H{başlangıç}-L6' ###             
             başlangıç +=1
             
                 
-        ws.cell(row=başlangıç, column=1).value = 'GENEL TOPLAM'
+        ws.cell(row=başlangıç, column=1).value = 'GENEL TOPLAM' # type: ignore
         Hizala.SağdaKalın(wb,başlangıç,1)
         ws.merge_cells(f'A{başlangıç}:G{başlangıç}')      
-        ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ilk + toplam_ana + toplam_mem
-        Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)   
-        ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00'   
+        ws.cell(row=başlangıç, column=self.meb_tut_col+1).value = toplam_ilk + toplam_ana + toplam_mem # type: ignore
+        Hizala.SağdaKalın(wb,başlangıç,self.meb_tut_col+1)    # type: ignore
+        ws.cell(row=başlangıç, column=self.meb_tut_col+1).number_format = '#,##0.00'    # type: ignore
         başlangıç += 4
 
         ws.cell(row=başlangıç, column=1).value = self.imzaListe[0]
@@ -271,26 +271,27 @@ class MYS():
     def işle(self, wb:Workbook, df:pd.DataFrame, başlangıç:int):
         ws = wb.active
         for i in range(len(df.values)):
-            ws.cell(row=başlangıç+i, column=self.meb_kur_col+1).value = df.values[i][self.meb_kur_col]
-            Hizala.Solda(wb,başlangıç+i,self.meb_kur_col+1)
-            ws.cell(row=başlangıç+i, column=self.meb_abo_col+1).value = df.values[i][self.meb_abo_col]
-            Hizala.Ortala(wb,başlangıç+i,self.meb_abo_col+1)
-            ws.cell(row=başlangıç+i, column=self.meb_ver_col+1).value = df.values[i][self.meb_ver_col]
-            Hizala.Ortala(wb,başlangıç+i,self.meb_ver_col+1)
-            ws.cell(row=başlangıç+i, column=self.meb_fat_col+1).value = df.values[i][self.meb_fat_col]
-            Hizala.Ortala(wb,başlangıç+i,self.meb_fat_col+1)
-            ws.cell(row=başlangıç+i, column=self.meb_tar_col+1).value = df.values[i][self.meb_tar_col]
-            Hizala.Ortala(wb,başlangıç+i,self.meb_tar_col+1)
-            ws.cell(row=başlangıç+i, column=self.meb_icm_col+1).value = df.values[i][self.meb_icm_col]
-            Hizala.Ortala(wb,başlangıç+i,self.meb_icm_col+1)
-            ws.cell(row=başlangıç+i, column=self.meb_tuk_col+1).value = df.values[i][self.meb_tuk_col]
-            Hizala.Ortala(wb,başlangıç+i,self.meb_tuk_col+1)
-            ws.cell(row=başlangıç+i, column=self.meb_tut_col+1).value = df.values[i][self.meb_tut_col]
-            ws.cell(row=başlangıç+i, column=self.meb_tut_col+1).number_format = '#,##0.00'
-            Hizala.Sağda(wb,başlangıç+i,self.meb_tut_col+1)      
+            ws.cell(row=başlangıç+i, column=self.meb_kur_col+1).value = df.values[i][self.meb_kur_col] # type: ignore
+            Hizala.Solda(wb,başlangıç+i,self.meb_kur_col+1) # type: ignore
+            ws.cell(row=başlangıç+i, column=self.meb_abo_col+1).value = df.values[i][self.meb_abo_col] # type: ignore
+            Hizala.Ortala(wb,başlangıç+i,self.meb_abo_col+1) # type: ignore
+            ws.cell(row=başlangıç+i, column=self.meb_ver_col+1).value = df.values[i][self.meb_ver_col] # type: ignore
+            Hizala.Ortala(wb,başlangıç+i,self.meb_ver_col+1) # type: ignore
+            ws.cell(row=başlangıç+i, column=self.meb_fat_col+1).value = df.values[i][self.meb_fat_col] # type: ignore
+            Hizala.Ortala(wb,başlangıç+i,self.meb_fat_col+1) # type: ignore
+            ws.cell(row=başlangıç+i, column=self.meb_tar_col+1).value = df.values[i][self.meb_tar_col] # type: ignore
+            Hizala.Ortala(wb,başlangıç+i,self.meb_tar_col+1) # type: ignore
+            ws.cell(row=başlangıç+i, column=self.meb_icm_col+1).value = df.values[i][self.meb_icm_col] # type: ignore
+            Hizala.Ortala(wb,başlangıç+i,self.meb_icm_col+1) # type: ignore
+            ws.cell(row=başlangıç+i, column=self.meb_tuk_col+1).value = df.values[i][self.meb_tuk_col] # type: ignore
+            Hizala.Ortala(wb,başlangıç+i,self.meb_tuk_col+1) # type: ignore
+            ws.cell(row=başlangıç+i, column=self.meb_tut_col+1).value = df.values[i][self.meb_tut_col] # type: ignore
+            ws.cell(row=başlangıç+i, column=self.meb_tut_col+1).number_format = '#,##0.00' # type: ignore
+            Hizala.Sağda(wb,başlangıç+i,self.meb_tut_col+1)       # type: ignore
  
 class Hizala():
-    def Solda(wb:Workbook, row, column):
+    @staticmethod
+    def Solda(wb, row, column):
         ws = wb.active
         ft = Font(color='FF000000', name='Times New Roman', size=10)
         thin = Side(border_style="thin", color="FF000000")
@@ -299,7 +300,8 @@ class Hizala():
         ws.cell(row=row, column=column).alignment = Alignment(horizontal="left", vertical="center")
         ws.cell(row=row, column=column).border = Border(top=thin, left=thin, right=thin, bottom=thin)
 
-    def Ortala(wb:Workbook, row, column):
+    @staticmethod
+    def Ortala(wb, row, column):
         ws = wb.active
         ft = Font(color='FF000000', name='Times New Roman', size=10)
         thin = Side(border_style="thin", color="FF000000")
@@ -308,14 +310,16 @@ class Hizala():
         ws.cell(row=row, column=column).alignment = Alignment(horizontal="center", vertical="center")
         ws.cell(row=row, column=column).border = Border(top=thin, left=thin, right=thin, bottom=thin)
 
-    def SadeOrta(wb:Workbook, row, column):
+    @staticmethod
+    def SadeOrta(wb, row, column):
         ws = wb.active
         ft = Font(color='FF000000', name='Times New Roman', size=10)
         
         ws.cell(row=row, column=column).font = ft
         ws.cell(row=row, column=column).alignment = Alignment(horizontal="center", vertical="center")
 
-    def Sağda(wb:Workbook, row, column):
+    @staticmethod
+    def Sağda(wb, row, column):
         ws = wb.active
         ft = Font(color='FF000000', name='Times New Roman', size=10)
         thin = Side(border_style="thin", color="FF000000")
@@ -324,7 +328,8 @@ class Hizala():
         ws.cell(row=row, column=column).alignment = Alignment(horizontal="right", vertical="center")
         ws.cell(row=row, column=column).border = Border(top=thin, left=thin, right=thin, bottom=thin)
 
-    def SağdaKalın(wb:Workbook, row, column):
+    @staticmethod
+    def SağdaKalın(wb, row, column):
         ws = wb.active
         ft = Font(color='FF000000', name='Times New Roman', size=12, bold=True)
         thin = Side(border_style="thin", color="FF000000")

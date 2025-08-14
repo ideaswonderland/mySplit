@@ -77,14 +77,13 @@ class Fatura():
                 #df_mys[['Tarih', 'Boş']] = df_mys['Fatura Tarihi'].str.split(' ', expand=True) #Fatura tarihi kısımını ayırıyor
                 #df_mys['Tarih'] = df_mys['Tarih'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
                 df_mys['Tarih'] = df_mys['Fatura Tarihi'].str.replace('-', '/') #Fatura tarihini mebbis'ten alınan dosyanın formatına dönüştürüyor
-                df_mys[['Sayaç No','Müşteri No','Tesisat No','Abone']]=df_mys['Müşteri Kimlik Bilgisi'].str.split('-', expand=True) #Müşteri kimlik bilgisi kısmını bölüyor
+                #df_mys[['Sayaç No','Müşteri No','Tesisat No','Abone']]=df_mys['Müşteri Kimlik Bilgisi'].str.split('-', expand=True) #Müşteri kimlik bilgisi kısmını bölüyor
+                df_mys[['Tesisat No','Abone']]=df_mys['Müşteri Kimlik Bilgisi'].str.split('-', expand=True) #Müşteri kimlik bilgisi kısmını bölüyor
                 df_mys['Abone']=df_mys['Abone'].astype(int) #abone numaralarını mebbis dosyasıyla eşlemek için tam sayı haline getiriyor
                 #gereksiz sütunları temizliyor
                 df_mys = df_mys.drop(columns=['Harcama Birimi',
                                             'Fatura Tarihi',
                                             'Müşteri Kimlik Bilgisi',
-                                            'Sayaç No',
-                                            'Müşteri No',
                                             'Tesisat No',
                                             'Okul'])
                 df_mys = df_mys[['Fatura No','Ödenecek Tutar','Tarih','Abone','VKN']]
@@ -105,6 +104,12 @@ class Fatura():
                 df_mebbis['ABONE NUMARASI']=df_mebbis['ABONE NUMARASI'].astype(int) #abone numaralarını mys dosyasıyla eşlemek için tam sayı haline getiriyor
                 df_mebbis['VERGİ NO']=df_mebbis['VERGİ NO'].astype(str) #ilerde hata almamak için kolonun veri tipini değiştiriyor
                 df_mebbis['İCMAL NO']=df_mebbis['İCMAL NO'].astype(str) #böylece normalde sayısal veriler kayıpsız şekilde metin olarak saklanabiliyor
+
+                # Eşleşme için mapping oluştur
+                mapping = dict(zip(df_mys['Fatura No'], df_mys['Ödenecek Tutar']))
+
+                # df_mebbis'teki FATURA NUMARASI'na göre FATURA TUTARI güncelle
+                df_mebbis['FATURA TUTARI'] = df_mebbis['FATURA NUMARASI'].map(mapping).fillna(df_mebbis['FATURA TUTARI'])
                 
                 df_mebbis_dummy = pd.read_excel(yolFatura, header=0, dtype=str) #aynı mebbis dosyasını okuyor ancak vergi no ve icmal metin olarak saklanmalı
                 cols_to_keep_dummy = ['VERGİ NO','İCMAL NO'] #bu veriler sayısal olarak saklanırsa başında 0 varsa siliyor
@@ -122,6 +127,7 @@ class Fatura():
                 df_kurum_mem = df_kurum[df_kurum['KURUM TÜRÜ']=='MEM'] #MEM'i ayırıyor
                 
                 #Tek kaynak formu işlemleri
+                
                 toplam = "{:,.2f}".format(df_mebbis['FATURA TUTARI'].sum())
                 toplam = toplam.replace(',','-')
                 toplam = toplam.replace('.',',')
@@ -210,8 +216,8 @@ class Fatura():
                 df_mys['Tarih'] = df_mys['Fatura Tarihi'].str.replace('-', '/')
                 #df_mys[['Sayaç No','Müşteri No','Tesisat No','Abone']]=df_mys['Müşteri Kimlik Bilgisi'].str.split('-', expand=True) #Müşteri kimlik bilgisi kısmını bölüyor
                 #df_mys['Abone']=df_mys['Abone'].astype(int) #abone numaralarını mebbis dosyasıyla eşlemek için tam sayı haline getiriyor
-                df_mys['Abone'] = 100207225527
-                df_mys['Abone']=df_mys['Abone'].astype(float)
+                df_mys['Abone'] = str(100207225527)
+                #df_mys['Abone']=df_mys['Abone'].astype(float)
 
                 #gereksiz sütunları temizliyor
                 """df_mys = df_mys.drop(columns=['Harcama Birimi',
@@ -220,7 +226,8 @@ class Fatura():
                                             'Okul'])"""
                 df_mys = df_mys[['Fatura No','Ödenecek Tutar','Tarih','Abone','VKN']]
 
-                df_mebbis = pd.read_excel(yolFatura, header=0) #mebbis dosyasından verileri çekiyor
+                df_mebbis = pd.read_excel(yolFatura, header=0,dtype={"ABONE NUMARASI": str}) #mebbis dosyasından verileri çekiyor
+                df_mebbis["ABONE NUMARASI"] = df_mebbis["ABONE NUMARASI"].str.replace(".0", "", regex=False).str.strip()
                 cols_to_keep_meb = [
                     'KURUM ADI',
                     'ABONE NUMARASI', 
@@ -233,7 +240,7 @@ class Fatura():
                 ]
                 df_mebbis = df_mebbis.reindex(cols_to_keep_meb, axis=1)
                 df_mebbis = df_mebbis.drop(df_mebbis.index[-1]) #tablodaki son satırı siliyor
-                df_mebbis['ABONE NUMARASI']=df_mebbis['ABONE NUMARASI'].astype(int) #abone numaralarını mys dosyasıyla eşlemek için tam sayı haline getiriyor
+                #df_mebbis['ABONE NUMARASI']=df_mebbis['ABONE NUMARASI'].astype(str) #abone numaralarını mys dosyasıyla eşlemek için tam sayı haline getiriyor
                 df_mebbis['VERGİ NO']=df_mebbis['VERGİ NO'].astype(str) #ilerde hata almamak için kolonun veri tipini değiştiriyor
                 df_mebbis['İCMAL NO']=df_mebbis['İCMAL NO'].astype(str) #böylece normalde sayısal veriler kayıpsız şekilde metin olarak saklanabiliyor
                 
